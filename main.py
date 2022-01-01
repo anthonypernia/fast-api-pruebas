@@ -3,7 +3,7 @@ from typing import Optional
 from enum import Enum
 #Pydantic
 from pydantic import BaseModel
-from pydantic import Field
+from pydantic import Field , HttpUrl
 
 #FastAPI
 from fastapi import FastAPI
@@ -13,6 +13,10 @@ app = FastAPI()
 
 #Models
 
+class UrlModel(BaseModel):
+    url: HttpUrl
+
+
 class HairColor(str, Enum):
     white = "white"
     blonde = "blonde"
@@ -21,28 +25,42 @@ class HairColor(str, Enum):
     red = "red"
 
 class Location(BaseModel):
-    city: str
-    state: str
-    country: str
+    city: str = Field(..., title="City", description="Person's city", example="New York")
+    state: str = Field(..., title="State", description="Person's state", example="NY")
+    country: str = Field(..., title="Country", description="Person's country", example="USA")
 
 class Person(BaseModel):
     firts_name: str = Field(..., 
                                 min_length=1, 
                                 max_length=50,
-                                title="First Name"
+                                title="First Name",
+                                example="Anthony",
                                 )
     last_name: str = Field(...,
                             min_length=1,
                             max_length=50,
-                            title="Last Name"
+                            title="Last Name",
+                            example="Herrera",
                             )
     age: int = Field(...,
                     gt=0,
                     le=115,
-                    title="Age"
+                    title="Age",
+                    example=30,
                     )
-    hair_color: Optional[HairColor] = Field(None, title="Hair Color")
-    is_married: Optional[bool] = Field(default=None, title="Married")
+    hair_color: Optional[HairColor] = Field(None, title="Hair Color", example="brown")
+    is_married: Optional[bool] = Field(default=None, title="Married", example=False)
+    
+    # class Config:
+    #     schema_extra = {
+    #         "example": {
+    #             "firts_name": "Anthony",
+    #             "last_name": "Pernia",
+    #             "age": 30,
+    #             "hair_color": "black",
+    #             "is_married": False
+    #         }
+    #     }
     
 
 
@@ -98,12 +116,12 @@ def update_person(
         title="person",
         description="this is the person",
         ),
-    location: Location = Body(
-        ...,
-        title="location",
-        description="this is the location",
-    )
+    # location: Location = Body(
+    #     ...,
+    #     title="location",
+    #     description="this is the location",
+    # )
 ):
-    results = person.dict()
-    results.update(location.dict())
-    return results
+    # results = person.dict()
+    # results.update(location.dict())
+    return person
