@@ -8,6 +8,7 @@ from pydantic import Field , HttpUrl
 #FastAPI
 from fastapi import FastAPI
 from fastapi import Body, Query, Path, Header
+from fastapi import status
 
 app = FastAPI()
 
@@ -62,18 +63,18 @@ class PersonOut(PersonBase):
     
 
 
-@app.get("/")
+@app.get(path="/", status_code=status.HTTP_200_OK)
 def home():
     return {"message": "Hello World"}
 
-##rquest and response body
+##request and response body
 
-@app.post('/person/new', response_model=PersonOut, response_model_exclude_unset=True)
+@app.post(path='/person/new', response_model=PersonOut, response_model_exclude_unset=True, status_code=status.HTTP_201_CREATED)
 def create_person(person: Person = Body(...)): #El triple punto indica que es oblicatorio el body
     return person
 
 #Validation query paramns
-@app.get("/person/detail/" )
+@app.get(path="/person/detail/", status_code=status.HTTP_200_OK)
 def show_person(name: Optional[str] = Query(
                 default=None, 
                 min_length=1, 
@@ -93,7 +94,7 @@ def show_person(name: Optional[str] = Query(
 
 ##NOTA: se va a tomar este path, porque python lee de arriba hacia abajo, por ende se va a quedar con el ultimo path que se haya definido
 #validation path parameters
-@app.get("/person/detail/{person_id}")
+@app.get("/person/detail/{person_id}", status_code=status.HTTP_200_OK)
 def show_person(person_id: int = Path(
                                     ..., 
                                     gt=0,
@@ -104,7 +105,7 @@ def show_person(person_id: int = Path(
     return {"person_id": person_id}
 
 #Validations body
-@app.put("/person/{person_id}")
+@app.put("/person/{person_id}", status_code=status.HTTP_200_OK)
 def update_person(
     person_id: int = Path(
         ..., 
