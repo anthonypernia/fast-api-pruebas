@@ -68,18 +68,18 @@ class LoginOut(BaseModel):
     message: str = Field(default="Welcome!!! Login succesfully", title="Message", example="Welcome")
 
 
-@app.get(path="/", status_code=status.HTTP_200_OK)
+@app.get(path="/", status_code=status.HTTP_200_OK, tags=["Home"])
 def home():
     return {"message": "Hello World"}
 
 ##request and response body
 
-@app.post(path='/person/new', response_model=PersonOut, response_model_exclude_unset=True, status_code=status.HTTP_201_CREATED)
+@app.post(path='/person/new', response_model=PersonOut, response_model_exclude_unset=True, status_code=status.HTTP_201_CREATED, tags=['Persons'])
 def create_person(person: Person = Body(...)): #El triple punto indica que es oblicatorio el body
     return person
 
 #Validation query paramns
-@app.get(path="/person/detail/", status_code=status.HTTP_200_OK)
+@app.get(path="/person/detail/", status_code=status.HTTP_200_OK, tags=['Persons'])
 def show_person(name: Optional[str] = Query(
                 default=None, 
                 min_length=1, 
@@ -100,7 +100,7 @@ def show_person(name: Optional[str] = Query(
 ##NOTA: se va a tomar este path, porque python lee de arriba hacia abajo, por ende se va a quedar con el ultimo path que se haya definido
 #validation path parameters
 persons = [1,2,3,4,5]
-@app.get("/person/detail/{person_id}", status_code=status.HTTP_200_OK)
+@app.get("/person/detail/{person_id}", status_code=status.HTTP_200_OK, tags=['Persons'])
 def show_person(person_id: int = Path(
                                     ..., 
                                     gt=0,
@@ -113,7 +113,7 @@ def show_person(person_id: int = Path(
     return {person_id: "Its exist!"}
 
 #Validations body
-@app.put("/person/{person_id}", status_code=status.HTTP_200_OK)
+@app.put(path="/person/{person_id}", status_code=status.HTTP_200_OK, tags=['Persons'])
 def update_person(
     person_id: int = Path(
         ..., 
@@ -137,13 +137,13 @@ def update_person(
     # results.update(location.dict())
     return person
 
-@app.post("/login", response_model=LoginOut , status_code=status.HTTP_200_OK)
+@app.post("/login", response_model=LoginOut , status_code=status.HTTP_200_OK, tags=['Persons'])
 def login(username: str = Form(...), password: str = Form(...)):
     return LoginOut(username=username)
 
 #cookies and headers
 
-@app.post(path="/contact", status_code=status.HTTP_200_OK)
+@app.post(path="/contact", status_code=status.HTTP_200_OK, tags=['Contact'])
 def contact(first_name: str = Form(..., max_length=20, min_length=1, title="Fist name", description="Person first name"),
             last_name: str = Form(..., max_length=20, min_length=1, title="last name", description="Person last name"),
             email: EmailStr = Form(...),
@@ -153,7 +153,7 @@ def contact(first_name: str = Form(..., max_length=20, min_length=1, title="Fist
             ):
     return user_agent
 
-@app.post(path='/post-image')
+@app.post(path='/post-image', tags=['Images'])
 def post_image(image: UploadFile = File(...)):
     return {"filename": image.filename,
             "Format": image.content_type,
