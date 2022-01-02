@@ -70,16 +70,41 @@ class LoginOut(BaseModel):
 
 @app.get(path="/", status_code=status.HTTP_200_OK, tags=["Home"])
 def home():
+    """
+    Home
+    
+    This is the home page
+    
+    Return a message
+    """
     return {"message": "Hello World"}
 
 ##request and response body
 
-@app.post(path='/person/new', response_model=PersonOut, response_model_exclude_unset=True, status_code=status.HTTP_201_CREATED, tags=['Persons'])
+@app.post(
+        path='/person/new', 
+        response_model=PersonOut, 
+        response_model_exclude_unset=True, 
+        status_code=status.HTTP_201_CREATED, 
+        tags=['Persons'], 
+        summary="Create person in the app"
+        )
 def create_person(person: Person = Body(...)): #El triple punto indica que es oblicatorio el body
+    """
+    Create Person
+
+    This path operation crate a person in the application.
+    
+    Parameters:
+    - Request body parameter:
+        - **person: Person** -> A person model with First Name, Last Name, Age, Hair Color, Married and Password.
+    
+    Return a person model with First Name, Last Name, Age, Hair Color and Married
+    """
     return person
 
 #Validation query paramns
-@app.get(path="/person/detail/", status_code=status.HTTP_200_OK, tags=['Persons'])
+@app.get(path="/person/detail/", status_code=status.HTTP_200_OK, tags=['Persons'], summary="Get person detail")
 def show_person(name: Optional[str] = Query(
                 default=None, 
                 min_length=1, 
@@ -94,13 +119,25 @@ def show_person(name: Optional[str] = Query(
                             description="this is the person age",
                             example="30",
                             )): ##Se coloca asi cuando quieres que sea obligatorio, los tres puntos
+    """
+    Show Person
+
+    This path operation show a person from the application.
+    
+    Parameters:
+    - Query parameters:
+        - **name: str** -> Person's name.
+        - **age: str** -> Person's age.
+    
+    Return name and age of the person
+    """
     return {name, age}
 
 
 ##NOTA: se va a tomar este path, porque python lee de arriba hacia abajo, por ende se va a quedar con el ultimo path que se haya definido
 #validation path parameters
 persons = [1,2,3,4,5]
-@app.get("/person/detail/{person_id}", status_code=status.HTTP_200_OK, tags=['Persons'])
+@app.get("/person/detail/{person_id}", status_code=status.HTTP_200_OK, tags=['Persons'], summary="Show person detail")
 def show_person(person_id: int = Path(
                                     ..., 
                                     gt=0,
@@ -108,6 +145,17 @@ def show_person(person_id: int = Path(
                                     description="this is the person id, greater than 0",
                                     example=23,
                                     )): ##Obligatorio
+    """
+    Show Person
+    
+    This path operation show a person from the application.
+
+    Parameters:
+    - Path parameters:
+        - **person_id: int** -> Person's id.
+    
+    Return person id
+    """
     if person_id not in persons:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This person not found")
     return {person_id: "Its exist!"}
@@ -126,15 +174,19 @@ def update_person(
         ..., 
         title="person",
         description="this is the person",
-        ),
-    # location: Location = Body(
-    #     ...,
-    #     title="location",
-    #     description="this is the location",
-    # )
-):
-    # results = person.dict()
-    # results.update(location.dict())
+        )):
+    """
+    Update Person
+    
+    This path operation update a person from the application.
+    
+    Parameters:
+    - Path parameters:
+        - **person_id: int** -> Person's id.
+    
+    Return person id
+    
+    """
     return person
 
 @app.post("/login", response_model=LoginOut , status_code=status.HTTP_200_OK, tags=['Persons'])
@@ -151,10 +203,35 @@ def contact(first_name: str = Form(..., max_length=20, min_length=1, title="Fist
             user_agent: Optional[str] = Header(default=None, title="User Agent", description="Person User Agent"),
             ads: Optional[str] = Cookie(default=None, title="Ads", description="Person Ads"),
             ):
+    """
+    Contact
+    This path operation contact a person from the application.
+    
+    Parameters:
+    - Form parameters:
+        - **first_name: str** -> Person's first name.
+        - **last_name: str** -> Person's last name.
+        - **email: EmailStr** -> Person's email.
+        - **message: str** -> Person's message.
+        - **user_agent: Optional[str]** -> Person's user agent.
+        - **ads: Optional[str]** -> Person's ads.
+    
+    Return person id
+    """
     return user_agent
 
 @app.post(path='/post-image', tags=['Images'])
 def post_image(image: UploadFile = File(...)):
+    """
+    Post Image
+    
+    This path operation post a image from the application and show caracteristics of the image.
+    
+    Parameters:
+        - **image: UploadFile** -> Image to upload.
+    Return image caracteristics
+    
+    """
     return {"filename": image.filename,
             "Format": image.content_type,
             "Size(kb)": round(len(image.file.read())/1024, ndigits=2)
