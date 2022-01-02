@@ -82,11 +82,13 @@ def show_person(name: Optional[str] = Query(
                 max_length=50,
                 title="person name",
                 description= "this is the person name, between 1 and 50 characters",
+                example="Santiago",
                 ), ##Asi cuando es opcional, y le colocas un valor por defecto
                 age: str = Query(
                             ..., 
                             title="Person age",
                             description="this is the person age",
+                            example="30",
                             )): ##Se coloca asi cuando quieres que sea obligatorio, los tres puntos
     return {name, age}
 
@@ -99,6 +101,7 @@ def show_person(person_id: int = Path(
                                     gt=0,
                                     title="person id",
                                     description="this is the person id, greater than 0",
+                                    example=23,
                                     )): ##Obligatorio
     return {"person_id": person_id}
 
@@ -110,6 +113,7 @@ def update_person(
         title="person_id",
         description="this is the person id",
         gt=0,
+        example=24,
         ),
     person: Person = Body(
         ..., 
