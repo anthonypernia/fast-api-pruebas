@@ -104,7 +104,7 @@ def create_person(person: Person = Body(...)): #El triple punto indica que es ob
     return person
 
 #Validation query paramns
-@app.get(path="/person/detail/", status_code=status.HTTP_200_OK, tags=['Persons'], summary="Get person detail")
+@app.get(path="/person/detail/", status_code=status.HTTP_200_OK, tags=['Persons'], summary="Get person detail", deprecated=True)
 def show_person(name: Optional[str] = Query(
                 default=None, 
                 min_length=1, 
